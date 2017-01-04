@@ -10,7 +10,7 @@ locale                   : "en"
 title                    : "Boban's Coding Asylum"
 title_separator          : "-"
 name                     : "Boban Stojanovski"
-description              : "Blog about web development mostly frontend, javascript, es6, angular and other stuff"
+description              : "Blog about web development mostly frontend tech, javascript, es6, angular and other stuff"
 url                      : "http://shlaki.com"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "boban984/boban984.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -60,13 +60,15 @@ facebook:
   username               :
   app_id                 :
   publisher              :
-og_image                 : # Open Graph/Twitter default site image
+og_image                 : /assets/images/bio-photo.jpg # Open Graph/Twitter default site image
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
-  type                   : # Person or Organization (defaults to Person)
-  name                   : # If the user or organization name differs from the site's name
+  type                   : Person # Person or Organization (defaults to Person)
+  name                   : Boban Stojanovski # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
+    - "https://twitter.com/boban984" 
+    - "https://www.linkedin.com/in/boban984"
 
 # Analytics
 analytics:
@@ -79,10 +81,10 @@ analytics:
 author:
   name             : "Boban Stojanovski"
   avatar           : "/assets/images/bio-photo.jpg"
-  bio              : Web developer with 10+ years of experience. Passionate about all things web related, mainly JavaScript, Angular, Asp.Net
+  bio              : "Web developer for more than 10 years, passionate about all things web, mainly JavaScript, Angular, Asp.Net ..."
   location         : "Skopje, Macedonia"
   email            : "boban.stojanovski@gmail.com"
-  uri              :
+  uri              : "http://shlaki.com"
   bitbucket        :
   codepen          :
   dribbble         :
@@ -138,7 +140,7 @@ exclude:
 keep_files:
   - .git
   - .svn
-encoding: "utf-8"
+encoding: utf-8
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
 
@@ -172,7 +174,7 @@ sass:
 permalink: /:categories/:title/
 paginate: 10 # amount of posts to show
 paginate_path: /page:num/
-timezone: # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: Europe/Skopje # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins

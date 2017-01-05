@@ -10,21 +10,21 @@ We will cover defining variables, dynamic typing, falsie values, default values,
 
 My first professional encounter with programming was using .net platform, so my favorite language used to be C# and I still think it is one of the best programming languages out there.
 
-After some time I started to get familiar with JavaScript mainly trough jQuery.
+After some time I started to get familiar with JavaScript mainly by using jQuery.
 
 I found the language confusing and irritating at first, but as I got to know more and more about JavaScript it quickly become a pleasure and great fun to work with, now I can say that it\'s my new favorite programming language.
 
 JavaScript is a lightweight, interpreted, object-oriented language with first-class functions, most known as the scripting language for Web pages, but used in non-browser environments as server-side programming (node.js) or Apache CouchDB, game development and the creation of desktop applications.
 
-What this means that you can do the same thing in lot\'s of different ways, the language offers freedom but you have to know what you are doing, so learning some basics at the beginning will save you a lot of pain later on.
+What this means that you can do the same thing in lots of different ways, the language offers freedom but you have to know what you are doing, so learning some basics at the beginning will save you a lot of pain later on.
 
 JS is a prototype-based, multi-paradigm scripting language that is dynamic, is type safe, and supports object-oriented, imperative, and functional programming styles.
 
-Let us see what is different between C# and JavaScript , these are not all differences just they key ones.
+Let us see what is different between C# and JavaScript, these are not all differences just they key ones.
 
 | C#  | JavaScript |
 |---|---|
-| Stongly-Typed | Loosely-Typed |
+| Strongly-Typed | Loosely-Typed |
 | Static | Dynamic |
 | Classical Inheritance	| Prototypal |
 | Classes | Functions |
@@ -36,7 +36,7 @@ but most of the code is still written statically.
 
 # Defining variables
 
-## C#
+## C\#
 
 Car ferrari = new Car();
 
@@ -83,7 +83,7 @@ This was strange for me at first, coming from C#.
 
 # Falsie values in JavaScript
 
-In JavaScript the following values are evaluated to false :
+In JavaScript the following values are evaluated to false:
 
 * false
 * null
@@ -135,19 +135,19 @@ console.log( undefined === false ); // false
 
 [code on jsfiddle](http://jsfiddle.net/boban984/E7trA/)
 
-Lets say we have a variable `name = "Bobi"` , that is of type string
+Lets say we have a variable `name = "Bobi"`, that is of type string
 
-In C# you would test a string value like this: `if ( name != null && name.length > 0) or name != ""`
+In C# you would test a string value like this: `if (name != null && name.length > 0) or name != ""`
 
 C# has a simple method for checking all these conditions `!string.IsNullOrEmpty(name)`, you shouldn\'t test like this is JavaScript.
 
-In JavaScript you can check for undefined, null, empty string and the other false values very easy like : `if(name) { ... }`
+In JavaScript you can check for undefined, null, empty string and the other false values easily like : `if(name) { ... }`
 
 # Default Values and Guards
 
 Using the false value checking we can easily set default values.
 
-The **\&\&** and **\|\|** operators are called short\-circuit operators.
+The **&&** and **||** operators are called short\-circuit operators.
 
 They will return the value of the second operand based on the value of the first operand, handy for guards and defaults.
 
@@ -195,7 +195,7 @@ Special values
 * undefined
 * false
 
-We can determine the type using `typeof` and `instanceof` commands :
+We can determine the type using `typeof` and `instanceof` commands:
 
 ```javascript
 typeof x or typeof(x) //The first one is most commonly used
@@ -306,7 +306,7 @@ if ("someString") {
 }
 ```
 
-Type coercion in JavaScript can be confusing , but it\'s just a feature of the language, we need to understand it not be afraid of it.
+Type coercion in JavaScript can be confusing, but it\'s just a feature of the language, we need to understand it not be afraid of it.
 
 Coercion happens when we use the `==` sign.
 
@@ -397,4 +397,4 @@ Nice tool to see how coercion works: [http://jscoercion.qfox.nl/](http://jscoerc
 Good blog post if u want to know more : 
 [http://webreflection.blogspot.com/2010/10/javascript-coercion-demystified.html](http://webreflection.blogspot.com/2010/10/javascript-coercion-demystified.html)
 
-That's it for now guys, hope you liked my blog post, i would appreciate any feedback, write some comments in the form bellow.
+That's it for now guys, hope you liked my blog post, I would appreciate any feedback, write some comments in the form bellow.

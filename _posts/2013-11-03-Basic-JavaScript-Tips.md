@@ -7,7 +7,7 @@ This blog post will be about some basic JavaScript you should know when beginnin
 also i will provide some key differences between C# (same applies for similar languages like java) and JavaScript.
 
 We will cover defining variables, dynamic typing, falsie values, default values, guards, determining type, and type coercion.
-
+<!--more-->
 My first professional encounter with programming was using .net platform, so my favorite language used to be C# and I still think it is one of the best programming languages out there.
 
 After some time I started to get familiar with JavaScript mainly by using jQuery.
@@ -50,32 +50,32 @@ The variable someCar will always be of type Car so we can\'t reassign that varia
 Types are now dynamic defined by their structure, checking is done at runtime.
 If you would try to access some property that doesn\'t exist you would get a message like property not defined or similar.
 
-~~~ javascript
+``` javascript
 var number = 1;
 number = new Date();
-~~~
+```
 
 Here you see that number can change the type.
 
 # Dynamic Typing
 
-~~~ javascript
+``` javascript
 var person = {
     name : "Bobi",
     age : "32"
 }
-~~~
+```
 
 Even though person is already defined as an object that has 2 properties name and age,
 we can add new properties at any time.
 
-~~~ javascript
+``` javascript
 person.phone = "070 333 444";
 
 person.sayHi = function () {
     alert('Hi i am '+ this.name);
 }
-~~~
+```
 
 This is a powerful aspect of the language that allows you to grow your object.
 
@@ -94,7 +94,7 @@ In JavaScript the following values are evaluated to false:
 
 Look at the following examples
 
-~~~ javascript
+``` javascript
 //For example, these all evaluate to false.
 console.log( null      ? true : false ); // false
 console.log( 0         ? true : false ); // false
@@ -131,7 +131,7 @@ console.log( "" === false        ); // false
 console.log( false === false     ); // true
 console.log( NaN === false       ); // false
 console.log( undefined === false ); // false
-~~~
+```
 
 [code on jsfiddle](http://jsfiddle.net/boban984/E7trA/)
 
@@ -155,30 +155,30 @@ The && operator is useful for checking for null objects before accessing their a
 
 Bad
 
-~~~ javascript
+``` javascript
 if (name == null) {
     name = "default value";
 }
-~~~
+```
 
 Still Bad
 
-~~~ javascript
+``` javascript
 name = name ? name : "default value";
-~~~
+```
 
 Good
 
-~~~ javascript
+``` javascript
 name = name || "default value";
-~~~
+```
 
 
 Guard against **null** object using &&, this way we avoid trying to access the property
 
-~~~ javascript
+``` javascript
 var name = obj && obj.name
-~~~
+```
 
 # Determining type
 
@@ -197,15 +197,15 @@ Special values
 
 We can determine the type using `typeof` and `instanceof` commands:
 
-~~~ javascript
+``` javascript
 typeof x or typeof(x) //The first one is most commonly used
 
 x instanceof constructor
-~~~
+```
 
 example:
 
-~~~ javascript
+``` javascript
 typeof undefined           // "undefined"
 typeof 0                    // "number"
 typeof true                 // "boolean"
@@ -218,14 +218,14 @@ typeof new Date             // "object"
 typeof null                 // "object"
 typeof function(){}         // "function"
 typeof NaN                  // "number"
-~~~
+```
 
 The last three checks are quirks in the language null is not a real object, you cant do:
 
-~~~ javascript
+``` javascript
 var foo = null
 foo.one = 1 // error, can't assign a property to primitive
-~~~
+```
 
 Functions are objects in JavaScript despite of their special treatment.
 
@@ -233,7 +233,7 @@ The `typeof NaN == 'number'` is a bit strange because `NaN` stands for \'Not-A-N
 
 The typeof operator works well for primitive types but it can\'t differentiate objects.
 
-~~~ javascript
+``` javascript
 // Common sample usage of typeof
 function f(x) {
  if (typeof x == 'function') {
@@ -248,7 +248,7 @@ if (typeof($) !== 'undefined')
 
 //The typeof is used here because if we check the variable directly we will get an error
 // if($) {...} will throw an error
-~~~
+```
 
 A global variable can be accessed as a property of built-in window object. Let\'s check it:
 
@@ -266,7 +266,7 @@ How do we check custom objects?
 
 We can do that using the instanceof operator, like so:
 
-~~~ javascript
+``` javascript
 function Person(name){
   this.name = name
 }
@@ -287,14 +287,14 @@ myString instanceof Date;   // returns false
 myDate instanceof Date;     // returns true
 myDate instanceof Object;   // returns true
 myDate instanceof String;   // returns false
-~~~
+```
 
 So in a few words, `typeof` use it for primitives and functions (wrong about null),
 instanceof good for custom objects and native ones too.
 
 # Type Coercion
 
-~~~ javascript
+``` javascript
 if ([0]) {
     [0] == true; //false
     !![0]; //true
@@ -304,7 +304,7 @@ if ("someString") {
     "someString" == false; //false
     "someString" == true; //false
 }
-~~~
+```
 
 Type coercion in JavaScript can be confusing, but it\'s just a feature of the language, we need to understand it not be afraid of it.
 
@@ -346,7 +346,7 @@ otherwise… | The result equals the input argument (no conversion).
 
 Examples:
 
-~~~ javascript
+``` javascript
 [0] == true;
 
 //what's going on
@@ -358,9 +358,9 @@ Examples:
 "0" == 1;
 //convert string using toNumber
 0 == 1; //false!
-~~~
+```
 
-~~~ javascript
+``` javascript
 "someString" == true;
 
 // what's going on
@@ -369,9 +369,9 @@ Examples:
 "someString" == 1;
 // convert string using toNumber
 NaN == 1; //false!
-~~~
+```
 
-~~~ javascript
+``` javascript
 "someString" == false;
 
 // what's going on 
@@ -381,16 +381,16 @@ NaN == 1; //false!
 
 // convert string using toNumber
 NaN == 0; //false!
-~~~
+```
 
-~~~ javascript
+``` javascript
 numObj = new Number(1);
 numObj == 1;
 
 // what's going on convert object using toPrimitive
 // valueOf returns a primitive so use it
 1 == 1; //true!
-~~~
+```
 
 Nice tool to see how coercion works: [http://jscoercion.qfox.nl/](http://jscoercion.qfox.nl/)
 

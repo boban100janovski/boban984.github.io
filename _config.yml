@@ -11,7 +11,7 @@ title                    : "Boban's Coding Asylum"
 title_separator          : "-"
 name                     : "Boban Stojanovski"
 description              : "Blog about web development mostly frontend tech, javascript, es6, angular and other stuff"
-url                      : "http://shlaki.com"
+url                      : "https://www.shlaki.com"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "boban984/boban984.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
@@ -81,7 +81,7 @@ analytics:
 author:
   name             : "Boban Stojanovski"
   avatar           : "/assets/images/bio-photo.jpg"
-  bio              : "Web developer, passionate about all things web, mainly JavaScript, Angular, Asp.Net"
+  bio              : "Web developer, passionate about all things web, mainly JavaScript, Angular, ASP.NET"
   location         : "Skopje, Macedonia"
   email            : "boban.stojanovski@gmail.com"
   uri              : "http://brainaux.com"
@@ -99,7 +99,7 @@ author:
   linkedin         : "boban984"
   pinterest        :
   soundcloud       :
-  stackoverflow    : "628653/boban-stojanovski" # "123456/username" (the last part of your profile url, e.g. http://stackoverflow.com/users/123456/username)
+  stackoverflow    : # "628653/boban-stojanovski" # "123456/username" (the last part of your profile url, e.g. http://stackoverflow.com/users/123456/username)
   steam            :
   tumblr           :
   twitter          : "boban984"

@@ -1,20 +1,23 @@
 ---
 tags: [Angular2, ROPC, OAUTH2, IdentityServer4, ASP.NET Core, TypeScript]
-title: OAuth2 ROPC Flow Authorization with Angular 2 
+title: OAuth2 Authentication with Angular 2 (ROPC Flow)
 ---
 
-This post will cover the topic of authenticating an Angular 2 client using the ROPC flow, managing the token
+This post will cover the topic of authenticating an Angular 2 client using the ROPC flow, managing the tokens (bearer and refresh token)
 and in brief how to setup IdentityServer4 for ROPC.
-We will also create a simple API using ASP.NET Core MVC 6.
+We will also create a simple API using ASP.NET Core MVC 6 to test out the tokens.
 <!--more-->
-Some basics first, what is ROPC?
+
+I will assume you already have some basic knowledge of Angular and TypeScript.
+
+Some basics first, what is ROPC authentication flow?
 
 > The OAuth 2.0 resource owner password grant allows a client to send username and password
 > to the token service and get an access token back that represents that user.
 
 ROPC flow should only be used for "trusted" clients,
 what that means is that the app sending the username and password to the AUTH server should be
-ideally written by you or a trusted 3rd party.
+written by you (ideally) or a trusted 3rd party.
 The reason being is that it will have the responsibility of transfering the users credentials securely
 and not exploit them.
 
@@ -42,15 +45,13 @@ A simple diagram showing ROPC flow.
 
 The creators of IdentityServer recomend that ROPC should not be used, and instead advice the use
 of "Implicit Flow" but that one involves an extra step of redirecting the user which i wanted to avoid
-for my app for UX purposes and also i am the creator of both the API and the client Angular 2 app.
+for my app for UX purposes and also i will create both the API and the client app.
 
-So let's get started with the IdentityServer.
+Before we start, make sure you have **Node** and **.Net Core** installed.
 
 ## Identity Server Setup
 
-Make sure you have **Node** installed and also **.Net Core**.
-
-First we will need to install some NPM packages from the terminal, like Yeoman to create our .net core project.
+First we will need to install some NPM packages from the terminal, like Yeoman to create our .net core projects.
 
  1. Install Yeoman and Bower globally : `npm install -g yo bower`
  2. Install the Asp.net generator for Yeoman : `npm install -g generator-aspnet`
@@ -74,27 +75,40 @@ Choose "Empty Web Application", next name the project "AuthServer"
 
 ![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/yoAspNet.jpg){: .align-center}
 
-Go to "AuthServer" folder and restore the needed .net core packages, then run the web app.
+Go to "AuthServer" folder and restore the needed .net core packages.
 
 ```
 cd AuthServer
 dotnet restore
-dotnet run
 ```
 
-Next, we add the IdentityServer4 nuget package by adding the following line to the project.json file in the "dependencies" property: `"IdentityServer4": "1.0.0"`
+Next, we add the IdentityServer4 nuget package by adding the following line to the project.json file in the "dependencies" property: `"IdentityServer4": "1.0.0"`.
+
+We should add one more package to Allow CORS since we will be calling the IdentityServer from a different port, add also `"Microsoft.AspNetCore.Cors": "1.1.0"`
+
+Your "project.json" file should look similar to the image below.
 
 ![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/dep.jpg){: .align-center}
 
-Run `dotnet restore` to fetch the IdentityServer4 package.
+Run `dotnet restore` to fetch the packages.
 
 Let's now add the IdentityServer services to ASP.NET core HTTP pipeline, go to `Startup.cs`,
-the `ConfigureServices` anf `Configure`  methods should like the code below.
+edit the `ConfigureServices` and `Configure` methods so they look like the code below.
 
 
 ``` csharp
 public void ConfigureServices(IServiceCollection services)
 {
+    services.AddCors(options=>
+    {
+        // this defines a CORS policy called "default"
+        options.AddPolicy("default", policy => {
+            policy.WithOrigins("http://localhost:5002")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+
    services.AddIdentityServer()
             .AddTemporarySigningCredential();
 }
@@ -103,6 +117,9 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 {
     loggerFactory.AddConsole(LogLevel.Debug);
     app.UseDeveloperExceptionPage();
+
+    // this uses the policy called "default"
+    app.UseCors("default");
 
     app.UseIdentityServer();
 }
@@ -121,7 +138,8 @@ Next thing to do is configure/add client app settings and a resource owner aka t
 
 ### Adding Users to IdentityServer4
 
-We will use the `TestUser` class provided by IdentityServer and store it in-memory, ideal for the purposes of this blog post,
+We will use the `TestUser` class provided by IdentityServer and store the user information in-memory,
+ideal for the purposes of this blog post,
 for production though you should store users information securely in a DataBase.
 
 I would recommend you use "ASP.NET Identity",
@@ -146,7 +164,7 @@ namespace AuthServer
                 {
                     SubjectId = "1",
                     Username = "boban",
-                    Password = "p@ssword"
+                    Password = "pass"
                 }
             };
         }
@@ -167,10 +185,11 @@ public static IEnumerable<ApiResource> GetApiResources()
 }
 ```
 
-We are missing the Client so let's add another method that returns a list of Clients.
+We have the user and the API defined, the Client is missing, so let's add another method that returns a list of Clients.
 
-The Client we will create will use the API we just added, so we will set the " AllowedScopes"
-property to "SecureAPI", this will restrict access to other APIs  we might have.
+The Client will use the API we just added, so we will set the "AllowedScopes"
+property to "SecureAPI", this will allow access to the named API, other APIs will not be accessible.
+You can play with the roles and scopes to fine-tune which user/client can access your API methods.
 
 ``` csharp
 // client want to access resources (aka scopes)
@@ -180,18 +199,19 @@ public static IEnumerable<Client> GetClients()
     return new List<Client>
     {
         // resource owner password grant client
-        new Client
-        {
-            ClientId = "ro.ng2Client",
+         new Client {
+            ClientId = "ng2Client",
             AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
             ClientSecrets = { new Secret("secret".Sha256()) },
-            AllowedScopes = { "SecureAPI" }
+            AllowOfflineAccess = true,
+            AllowedScopes = { "SecureAPI" },
+            AllowedCorsOrigins = { "http://localhost:5002" }
         }
     };
 }
 ```
 
-Now we need to tell IdentityServer about the Users, APIs and Clients, we do that in the "Startup.cs" file.
+Now we need to tell IdentityServer about the Users, APIs and Clients we created, to do that open the "Startup.cs" file.
 Let's revisit the "ConfigureServices" method.
 
 ``` csharp
@@ -209,13 +229,14 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-That's it, we are done setting up IdentityServer, start the AuthServer, type in the terminal `dotnet run` and go to [http://localhost:5000/.well-known/openid-configuration](http://localhost:5000/.well-known/openid-configuration)
+That's it, we are done setting up IdentityServer, let's start it, run `dotnet run` in the terminal and go to [http://localhost:5000/.well-known/openid-configuration](http://localhost:5000/.well-known/openid-configuration)
 if you see the JSON (so-called discovery document) then all went fine.
 
 ![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/discoveryDocument.jpg){: .align-center}
 
 ## Creating the API
 
+With the IdentityServer all done, it's time to create a very simple API using ASP.NET Core MVC.
 Open the terminal and go to the "ROPCDemo" folder, again we will use Yeoman to scaffold our API project, run `yo aspnet`.
 
 Go down in the project options and select "Web API Application", name the project "API", after the project has been created
@@ -261,10 +282,10 @@ What will this middleware do:
 * validate the incoming token to make sure it is coming from a trusted issuer
 * validate that the token is valid to be used with this api (aka scope)
 
-Add the following package to your project.json: `"IdentityServer4.AccessTokenValidation": "1.0.1"` 
+Add the following package to your project.json: `"IdentityServer4.AccessTokenValidation": "1.0.1"`
 and run `dotnet restore`.
 
-After the packages has been downloaded, we can add it to the pipeline,
+After the packages have been downloaded, we can add it to the pipeline,
 open "Startup.cs" and add the IdentityServer middleware as shown below.
 
 ``` csharp
@@ -297,3 +318,31 @@ instead we got an error code "401 Unauthorized" (open the network tab on your br
 Yay the API is now secured.
 
 ## Creating the Angular Client
+
+With the API and the IdentityServer setup we can now focus on the Angular client.
+Most of the work here we will need to be done on managing the bearer token and the refresh token.
+As before we will use Yeoman to generate our Angular 2 project, we will be using the generator from ["Steve Sanders"](http://blog.stevensanderson.com/).
+
+Learn more about that [here](https://github.com/aspnet/JavaScriptServices).
+
+I am using this generator because i've already used it a couple of times and i really like what it brings to the table,
+feel free to use others such as Angular CLI or my preffered way ... create everything from scratch by hand.
+
+The generator will create an Angular 2 Client app with MVC and WebPack already setup.
+
+Fire up the terminal, let's install the generator first, run the following command: `npm install -g generator-aspnetcore-spa`.
+
+After it's installed, create a new folder called "ngxClient" in the "ROPCDemo" folder and
+navigate to it, then run `yo aspnetcore-spa` and select the "Angular 2" template.
+
+On my laptop the generator is finished in about a minute or two, so be patient.
+
+If everything went ok you should be able to run the project by using `dotnet run` in the "ngxClient" folder.
+
+![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/ngxClient1.jpg){: .align-center}
+
+I will use the home component to build the UI for sending the username/password to the IdentityServer.
+
+![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg){: .align-center}
+
+First we will create the service for managing the tokens

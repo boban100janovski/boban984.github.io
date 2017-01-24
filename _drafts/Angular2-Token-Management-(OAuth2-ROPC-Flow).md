@@ -1,6 +1,6 @@
 ---
 tags: [Angular2, ROPC, OAUTH2, IdentityServer4, ASP.NET Core, TypeScript]
-title: OAuth2 Authentication with Angular 2 (ROPC Flow)
+title: Angular 2 Token Management (OAuth2 - ROPC Flow)
 ---
 
 This post will cover the topic of authenticating an Angular 2 client using the ROPC flow, managing the tokens (bearer and refresh token)
@@ -110,7 +110,7 @@ public void ConfigureServices(IServiceCollection services)
     });
 
    services.AddIdentityServer()
-            .AddTemporarySigningCredential();
+           .AddTemporarySigningCredential();
 }
 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -128,7 +128,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerF
 > The `AddTemporarySigningCredential` extension creates temporary RSA key pair for signing tokens on every startup.
 > Useful to get started, but needs to be replaced by some persistent key material for production scenarios.
 
-> `AddIdentityServer` registers the IdentityServer services in DI.  
+> `AddIdentityServer` registers the IdentityServer services in DI.
 > It also registers an in-memory store for runtime state.
 > This is useful for development scenarios.
 > For production scenarios you need a persistent or shared store like a database or cache for that.
@@ -205,7 +205,10 @@ public static IEnumerable<Client> GetClients()
             ClientSecrets = { new Secret("secret".Sha256()) },
             AllowOfflineAccess = true,
             AllowedScopes = { "SecureAPI" },
-            AllowedCorsOrigins = { "http://localhost:5002" }
+            AllowedCorsOrigins = { "http://localhost:5002" },
+
+            AccessTokenLifetime = 60,
+            AbsoluteRefreshTokenLifetime = 300
         }
     };
 }
@@ -345,4 +348,30 @@ I will use the home component to build the UI for sending the username/password 
 
 ![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg){: .align-center}
 
-First we will create the service for managing the tokens
+There are a couple of situations we need to care of :
+ * Store token
+ * Schedule refresh token after expiration
+ * Schedule the refresh after a page refresh
+ * UnSchedule the refresh after user logs out
+
+Part of the code is borrowed and sligtly modified from [angular2-jwt](https://github.com/auth0/angular2-jwt),
+, we have some methods in there we can use for decoding and extracting the data from the token
+, what's missing there is the part about refreshing the token
+, we have some of the logic for the refreshing in this [blog post](http://blog.ionic.io/ionic-2-and-auth0/).
+
+I will combine the two so we will have a working Angular 2 app that handles the tokens and the Http calls to the API.
+
+Let's start then, create an interface for the token response
+
+``` ts
+export interface IAuthInfo {
+    access_token: string;
+    expires_in: number;
+    token_type: string;
+    refresh_token: string;
+}
+```
+
+i put the new file in '/ClientApp/app/common/models/' folder, we will use it
+to set the response type, of the call to the IdentityServer.
+

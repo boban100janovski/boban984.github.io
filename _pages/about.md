@@ -1,9 +1,8 @@
 ---
 layout: single
-title: About Boban Stojanovski
+title: About Me
 permalink: /about/
 ---
-
 10+ years professional experience in web development covering the full stack of technologies, back-end and front-end 
 (although more focused on the front-end these past few years).
 

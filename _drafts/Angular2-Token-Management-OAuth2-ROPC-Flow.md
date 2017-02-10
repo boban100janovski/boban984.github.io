@@ -1,12 +1,16 @@
 ---
 tags: [Angular2, ROPC, OAUTH2, IdentityServer4, ASP.NET Core, TypeScript]
-title: Angular 2 Token Management (OAuth2 - ROPC Flow)
+title: Angular 2 Token Management, OAuth2 - ROPC Flow
 ---
+{% include toc %}
 
 This post will cover the topic of authenticating an Angular 2 client using the ROPC flow, managing the tokens (bearer and refresh token)
-and in brief how to setup IdentityServer4 for ROPC.
+and in brief how to setup IdentityServer4 for the ROPC flow.
 We will also create a simple API using ASP.NET Core MVC 6 to test out the tokens.
 <!--more-->
+
+If you have a the Authentication and API layer already done, feel free to jump to the Angular client part of this post,
+the auth service class that holds the logic is not tied to a specific backend implementation so it will work for your project as well, just make sure you change the URLs.
 
 I will assume you already have some basic knowledge of Angular and TypeScript.
 
@@ -320,10 +324,10 @@ instead we got an error code "401 Unauthorized" (open the network tab on your br
 
 Yay the API is now secured.
 
-## Creating the Angular Client
+## Angular 2 Token Management
 
 With the API and the IdentityServer setup we can now focus on the Angular client.
-Most of the work here we will need to be done on managing the bearer token and the refresh token.
+Most of the work here will need to be done on managing the bearer and refresh token.
 As before we will use Yeoman to generate our Angular 2 project, we will be using the generator from ["Steve Sanders"](http://blog.stevensanderson.com/).
 
 Learn more about that [here](https://github.com/aspnet/JavaScriptServices).
@@ -346,18 +350,21 @@ If everything went ok you should be able to run the project by using `dotnet run
 
 I will use the home component to build the UI for sending the username/password to the IdentityServer.
 
-![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg){: .align-center}
+<!--[![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg)]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg){: .align-center .image-popup}-->
+
+![image-center]({{ site.url }}{{ site.baseurl }}/assets/images/posts/OAuth2-ROPC-autentication-with-Angular2/home.jpg)
 
 There are a couple of situations we need to care of :
- * Store token
- * Schedule refresh token after expiration
- * Schedule the refresh after a page refresh
- * UnSchedule the refresh after user logs out
+
+* Store tokens
+* Schedule a refresh of the token after expiration from a login (no tokens to begin with)
+* Schedule the refresh after a page refresh (we already have the tokens)
+* UnSchedule the refresh observer and revoke the token after user logs out
 
 Part of the code is borrowed and sligtly modified from [angular2-jwt](https://github.com/auth0/angular2-jwt),
 , we have some methods in there we can use for decoding and extracting the data from the token
 , what's missing there is the part about refreshing the token
-, we have some of the logic for the refreshing in this [blog post](http://blog.ionic.io/ionic-2-and-auth0/).
+, we have some of the logic about refreshing at this [blog post](http://blog.ionic.io/ionic-2-and-auth0/).
 
 I will combine the two so we will have a working Angular 2 app that handles the tokens and the Http calls to the API.
 
@@ -372,6 +379,64 @@ export interface IAuthInfo {
 }
 ```
 
-i put the new file in '/ClientApp/app/common/models/' folder, we will use it
+i added the new file in `/ClientApp/app/common/models/` folder, we will use it
 to set the response type, of the call to the IdentityServer.
 
+Now we will create the Auth service which will handle all the main requierments for managing the tokens.
+
+Create a new service in the `/ClientApp/app/common/services/auth.service.ts`.
+
+We will put all the token endpoints at the top and also an observable for the token
+
+``` ts
+import { Injectable, EventEmitter } from '@angular/core';
+import { Http, Headers, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import '../rxjs-extensions';
+
+import { IAuthInfo } from '../models/IAuthInfo';
+
+@Injectable()
+export class AuthService {
+    public tokenStream: Observable<string>;
+    private _refreshSubscription: any;
+
+    // Endpoints
+    public static apiUrl: string = 'localhost:5001';
+    public static baseAuthUrl = 'localhost:5000/connect/';
+    public static tokenUrl = AuthService.baseAuthUrl + 'token';
+    public static revokeUrl = AuthService.baseAuthUrl + 'revocation';
+    public static infoUrl = AuthService.baseAuthUrl + 'userinfo';
+
+    public static clientId: string = 'ng2Client';
+    public static clientSecret = 'secret';
+}
+```
+
+Ok, now let's add the constructor and a `authInfo` property which we will use to store and retrieve the Token information, using localStorage.
+The constructor is where we tell our `tokenStream` observable where to get the value from.
+
+``` ts
+    constructor(private _http: Http) {
+        this.tokenStream = new Observable<string>((obs: any) => {
+            obs.next(this.authInfo.access_token);
+        });
+    }
+
+    /**
+     * The AuthInfo ( access token and refresh token)
+     */
+    private _authInfo: IAuthInfo = null;
+    get authInfo(): IAuthInfo {
+        return this._authInfo || JSON.parse(localStorage.getItem('authInfo'));
+    }
+    set authInfo(token: IAuthInfo) {
+        if (token) {
+            this._authInfo = token;
+            localStorage.setItem('authInfo', JSON.stringify(token));
+        } else {
+            this._authInfo = null;
+            localStorage.removeItem('authInfo');
+        }
+    }
+```

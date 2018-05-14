@@ -2,6 +2,7 @@
 tags: javascript
 title: Basic JavaScript Tips and Tricks
 ---
+{% include toc %}
 
 This blog post will be about some basic JavaScript you should know when beginning to write JS (it will save you a lot of time and headaches),
 also i will provide some key differences between C# (same applies for similar languages like java) and JavaScript.

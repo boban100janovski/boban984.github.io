@@ -99,7 +99,6 @@ Run `dotnet restore` to fetch the packages.
 Let's now add the IdentityServer services to ASP.NET core HTTP pipeline, go to `Startup.cs`,
 edit the `ConfigureServices` and `Configure` methods so they look like the code below.
 
-
 ``` csharp
 public void ConfigureServices(IServiceCollection services)
 {

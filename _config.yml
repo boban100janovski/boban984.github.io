@@ -84,14 +84,14 @@ author:
   bio              : "Web developer, passionate about all things web, mainly JavaScript, Angular, ASP.NET"
   location         : "Skopje, Macedonia"
   email            : "boban.stojanovski@gmail.com"
-  uri              : "http://brainaux.com"
+  uri              :
   bitbucket        :
   codepen          :
   dribbble         :
   flickr           :
   facebook         :
   foursquare       :
-  github           : "boban984"
+  github           : "boban100janovski"
   google_plus      :
   keybase          :
   instagram        :
@@ -99,7 +99,7 @@ author:
   linkedin         : "boban984"
   pinterest        :
   soundcloud       :
-  stackoverflow    : # "628653/boban-stojanovski" # "123456/username" (the last part of your profile url, e.g. http://stackoverflow.com/users/123456/username)
+  stackoverflow    : "628653/boban-stojanovski"
   steam            :
   tumblr           :
   twitter          : "boban984"
